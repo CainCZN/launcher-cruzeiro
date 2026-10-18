@@ -23,7 +23,6 @@ jobs:
             cp -r extracted_proj/*/* . 2>/dev/null || cp -r extracted_proj/* . 2>/dev/null || true
             rm -rf extracted_proj
           fi
-          
           mkdir -p app/src/main/java/com/nacaoazul/launcher
 
       - name: Set up JDK 17
@@ -49,4 +48,3 @@ jobs:
         with:
           name: nacaoazul-launcher-apk
           path: app/build/outputs/apk/debug/app-debug.apk
-concurrency: 
