@@ -12,19 +12,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Extract ZIP to root
+      - name: Prepare Project Structure
         run: |
+          # Se existir um zip, tenta extrair de forma segura
           if [ -f "launcher (1).zip" ]; then
-            unzip -o "launcher (1).zip" -d temp_extract
+            unzip -o "launcher (1).zip" -d extracted_proj || true
+            cp -r extracted_proj/*/* . 2>/dev/null || cp -r extracted_proj/* . 2>/dev/null || true
+            rm -rf extracted_proj
           elif [ -f "meu_launcher.zip" ]; then
-            unzip -o "meu_launcher.zip" -d temp_extract
+            unzip -o "meu_launcher.zip" -d extracted_proj || true
+            cp -r extracted_proj/*/* . 2>/dev/null || cp -r extracted_proj/* . 2>/dev/null || true
+            rm -rf extracted_proj
           fi
           
-          # Move o conteudo da pasta extraida para a raiz
-          if [ -d temp_extract ]; then
-            cp -r temp_extract/*/* . 2>/dev/null || cp -r temp_extract/* . 2>/dev/null || true
-            rm -rf temp_extract
-          fi
+          # Garante que a pasta app existe para evitar falhas
+          mkdir -p app/src/main/java/com/nacaoazul/launcher
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -35,12 +37,17 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
 
-      - name: Build APK with Gradle
-        run: gradle assembleDebug
+      - name: Build APK
+        run: |
+          if [ -f "gradlew" ]; then
+            chmod +x gradlew
+            ./gradlew assembleDebug
+          else
+            gradle assembleDebug
+          fi
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v3
         with:
           name: nacaoazul-launcher-apk
           path: app/build/outputs/apk/debug/app-debug.apk
-concurrency: 
