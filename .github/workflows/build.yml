@@ -14,7 +14,6 @@ jobs:
 
       - name: Prepare Project Structure
         run: |
-          # Se existir um zip, tenta extrair de forma segura
           if [ -f "launcher (1).zip" ]; then
             unzip -o "launcher (1).zip" -d extracted_proj || true
             cp -r extracted_proj/*/* . 2>/dev/null || cp -r extracted_proj/* . 2>/dev/null || true
@@ -25,7 +24,6 @@ jobs:
             rm -rf extracted_proj
           fi
           
-          # Garante que a pasta app existe para evitar falhas
           mkdir -p app/src/main/java/com/nacaoazul/launcher
 
       - name: Set up JDK 17
@@ -47,7 +45,8 @@ jobs:
           fi
 
       - name: Upload APK Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: nacaoazul-launcher-apk
           path: app/build/outputs/apk/debug/app-debug.apk
+concurrency: 
