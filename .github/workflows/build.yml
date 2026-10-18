@@ -14,8 +14,11 @@ jobs:
 
       - name: Unzip project
         run: |
-          if [ -f meu_launcher.zip ]; then
-            unzip -o meu_launcher.zip -d .
+          if [ -f "launcher (1).zip" ]; then
+            unzip -o "launcher (1).zip" -d extracted_folder
+            cp -r extracted_folder/* .
+          elif [ -f "meu_launcher.zip" ]; then
+            unzip -o "meu_launcher.zip" -d .
           fi
 
       - name: Set up JDK 17
