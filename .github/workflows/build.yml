@@ -10,15 +10,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Unzip project
+      - name: Extract ZIP to root
         run: |
           if [ -f "launcher (1).zip" ]; then
-            unzip -o "launcher (1).zip" -d extracted_folder
-            cp -r extracted_folder/* .
+            unzip -o "launcher (1).zip" -d temp_extract
           elif [ -f "meu_launcher.zip" ]; then
-            unzip -o "meu_launcher.zip" -d .
+            unzip -o "meu_launcher.zip" -d temp_extract
+          fi
+          
+          # Move o conteudo da pasta extraida para a raiz
+          if [ -d temp_extract ]; then
+            cp -r temp_extract/*/* . 2>/dev/null || cp -r temp_extract/* . 2>/dev/null || true
+            rm -rf temp_extract
           fi
 
       - name: Set up JDK 17
@@ -30,11 +35,12 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
 
-      - name: Build APK
+      - name: Build APK with Gradle
         run: gradle assembleDebug
 
-      - name: Upload APK
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v3
         with:
           name: nacaoazul-launcher-apk
           path: app/build/outputs/apk/debug/app-debug.apk
+concurrency: 
